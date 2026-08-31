@@ -125,6 +125,17 @@ This downloads each platform's release asset, records its checksum in
 [`support/latest`](support/latest). Pass `--historical` to pin an older
 release without changing what `latest` resolves to.
 
+A self-hosted [Renovate](https://github.com/rubyatscale/rubyfmt-action/blob/main/.github/workflows/renovate.yml)
+job runs weekly and opens a PR bumping [`support/latest`](support/latest)
+when a new `rubyfmt` release is available, and similarly for the `shellcheck`
+version pinned in [`ci.yml`](.github/workflows/ci.yml). Neither of those PRs
+update the corresponding checksum(s) automatically (there's nothing for
+Renovate to safely fetch a checksum from), so CI on those PRs fails until the
+checksum is refreshed — run `support/sync-versions.sh <tag>` for `rubyfmt`,
+or manually recompute and update `SHELLCHECK_SHA256` for `shellcheck`.
+Dependabot (see [`dependabot.yml`](.github/dependabot.yml)) separately
+handles the rest of this repo's GitHub Actions dependencies.
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for
