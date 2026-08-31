@@ -22,6 +22,16 @@
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "fables-tales/rubyfmt",
       "extractVersionTemplate": "^v(?<version>.*)$"
+    },
+    {
+      "customType": "regex",
+      "description": "actionlint download script, SHA-pinned with a version comment in ci.yml (same convention as our uses:@sha # vX.Y.Z action pins)",
+      "managerFilePatterns": [".github/workflows/ci.yml"],
+      "matchStrings": [
+        "raw\\.githubusercontent\\.com/rhysd/actionlint/(?<currentDigest>[a-f0-9]{40})/scripts/download-actionlint\\.bash\"\\) # (?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "rhysd/actionlint"
     }
   ],
   "packageRules": [
