@@ -60,8 +60,10 @@ jobs:
 
       - name: Assert the action failed
         if: steps.rubyfmt.outcome != 'failure'
+        env:
+          ACTUAL_OUTCOME: ${{ steps.rubyfmt.outcome }}
         run: |
-          echo "::error::Expected rubyfmt-action to fail on an unformatted fixture, but it reported '${{ steps.rubyfmt.outcome }}'"
+          echo "::error::Expected rubyfmt-action to fail on an unformatted fixture, but it reported '${ACTUAL_OUTCOME}'"
           exit 1
 
   test-macos:
