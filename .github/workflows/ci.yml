@@ -11,6 +11,10 @@ permissions: {}
 jobs:
   lint:
     runs-on: ubuntu-latest
+    env:
+      # renovate: datasource=github-releases depName=koalaman/shellcheck
+      SHELLCHECK_VERSION: v0.11.0
+      SHELLCHECK_SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -20,13 +24,13 @@ jobs:
       - name: Download shellcheck
         run: |
           curl --fail --silent --show-error --location --output /tmp/shellcheck.tar.xz \
-            "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz"
-          echo "8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198  /tmp/shellcheck.tar.xz" | sha256sum -c -
+            "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz"
+          echo "${SHELLCHECK_SHA256}  /tmp/shellcheck.tar.xz" | sha256sum -c -
           tar --extract --xz --file /tmp/shellcheck.tar.xz --directory /tmp
         shell: bash
 
       - name: Shellcheck
-        run: find . -type f -name "*.sh" -print0 | xargs -0 /tmp/shellcheck-v0.11.0/shellcheck
+        run: find . -type f -name "*.sh" -print0 | xargs -0 "/tmp/shellcheck-${SHELLCHECK_VERSION}/shellcheck"
         shell: bash
 
       - name: Download actionlint

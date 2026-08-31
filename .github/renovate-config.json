@@ -1,0 +1,35 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "onboarding": false,
+  "requireConfig": "optional",
+  "enabledManagers": ["custom.regex"],
+  "schedule": ["before 4am on monday"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "shellcheck version pinned in ci.yml (checksum needs a manual refresh; CI fails loudly if it's stale)",
+      "managerFilePatterns": [".github/workflows/ci.yml"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\s+SHELLCHECK_VERSION: (?<currentValue>\\S+)"
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "rubyfmt version pinned in support/latest (checksums need a manual refresh via support/sync-versions.sh; CI fails loudly if stale)",
+      "managerFilePatterns": ["support/latest"],
+      "matchStrings": ["(?<currentValue>\\S+)"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "fables-tales/rubyfmt",
+      "extractVersionTemplate": "^v(?<version>.*)$"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDepNames": ["koalaman/shellcheck", "fables-tales/rubyfmt"],
+      "prBodyNotes": [
+        "This bumps a version pin only. The checksum(s) in this file were **not** updated automatically — CI will fail with a checksum mismatch until they're refreshed. For `fables-tales/rubyfmt`, run `support/sync-versions.sh <tag>`. For `koalaman/shellcheck`, recompute the sha256 of the new release's `shellcheck-<version>.linux.x86_64.tar.xz` asset and update `SHELLCHECK_SHA256` in `.github/workflows/ci.yml`."
+      ]
+    }
+  ]
+}
