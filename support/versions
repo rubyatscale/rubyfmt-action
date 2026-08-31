@@ -1,0 +1,8 @@
+# Pinned rubyfmt release checksums, keyed by "<version> <platform>".
+#
+# This file is maintained by support/sync-versions.sh. Do not hand-edit it;
+# re-run the script instead so checksums are computed from the actual
+# release assets.
+0.14.2-10 Linux-x86_64 726a8290667c9903dab15b8a0aa39434cc8ede584efdc7423cb2284714127a5b
+0.14.2-10 Darwin-arm64 9a6facd3d1192c632a90a885ae39d3534509bb34b9092078a2dad3abf7d6322b
+0.14.2-10 Linux-aarch64 b4cfa66ce366484b0c6cc1885e745347b22800c96d5f1f34212375259039c43d

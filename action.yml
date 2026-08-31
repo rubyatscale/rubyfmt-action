@@ -1,0 +1,73 @@
+name: rubyfmt-action
+description: Check Ruby formatting with rubyfmt
+
+branding:
+  icon: "check-circle"
+  color: "red"
+
+outputs:
+  outcome:
+    description: |
+      Either 'success' (all files are formatted) or 'failure' (rubyfmt found
+      unformatted files or an error occurred).
+    value: ${{ steps.run-rubyfmt.outputs.outcome }}
+
+inputs:
+  paths:
+    description: |
+      The paths to pass to `rubyfmt --check`.
+
+      This should be a whitespace-separated list of files and/or directories.
+      Inputs will be split with shell splitting rules.
+    required: false
+    default: "."
+  version:
+    description: |
+      The version of `rubyfmt` to use.
+
+      This can be 'latest' (default) or an exact version, e.g. '0.14.2-10'
+      (with or without a leading 'v').
+    required: false
+    default: "latest"
+  fail-fast:
+    description: |
+      Whether `rubyfmt` should fail immediately on syntax/IO errors, instead
+      of warning and continuing.
+    required: false
+    default: "false"
+  include-gitignored:
+    description: |
+      Whether to also check files that are excluded by `.gitignore`.
+    required: false
+    default: "false"
+  header-mode:
+    description: |
+      Controls `rubyfmt`'s magic header comment behavior.
+
+      This can be 'none' (default), 'opt-in' (only check files containing a
+      `# rubyfmt: true` header), or 'opt-out' (skip files containing a
+      `# rubyfmt: false` header).
+    required: false
+    default: "none"
+  summary:
+    description: |
+      Whether to write a diff summary to the job summary
+      (`$GITHUB_STEP_SUMMARY`) when unformatted files are found.
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Run rubyfmt
+      id: run-rubyfmt
+      run: |
+        "${GITHUB_ACTION_PATH}/action.sh"
+      env:
+        GHA_RUBYFMT_PATHS: ${{ inputs.paths }}
+        GHA_RUBYFMT_VERSION: ${{ inputs.version }}
+        GHA_RUBYFMT_FAIL_FAST: ${{ inputs.fail-fast }}
+        GHA_RUBYFMT_INCLUDE_GITIGNORED: ${{ inputs.include-gitignored }}
+        GHA_RUBYFMT_HEADER_MODE: ${{ inputs.header-mode }}
+        GHA_RUBYFMT_SUMMARY: ${{ inputs.summary }}
+      shell: bash

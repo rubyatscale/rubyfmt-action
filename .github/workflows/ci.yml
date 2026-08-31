@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["**"]
+
+permissions: {}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Shellcheck
+        uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38 # 2.0.0
+        with:
+          scandir: "."
+
+      - name: actionlint
+        uses: raven-actions/actionlint@3a24062651993d40fed1019b58ac6fbdfbf276cc # v2.0.1
+
+  test-formatted:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Run rubyfmt-action against a formatted fixture (expect success)
+        uses: ./
+        with:
+          paths: test/fixtures/formatted.rb
+
+  test-unformatted:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Run rubyfmt-action against an unformatted fixture (expect failure)
+        id: rubyfmt
+        continue-on-error: true
+        uses: ./
+        with:
+          paths: test/fixtures/unformatted.rb
+
+      - name: Assert the action failed
+        if: steps.rubyfmt.outcome != 'failure'
+        run: |
+          echo "::error::Expected rubyfmt-action to fail on an unformatted fixture, but it reported '${{ steps.rubyfmt.outcome }}'"
+          exit 1
+
+  test-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Run rubyfmt-action against a formatted fixture (expect success)
+        uses: ./
+        with:
+          paths: test/fixtures/formatted.rb
