@@ -27,7 +27,11 @@ jobs:
         shell: bash
 
       - name: actionlint
-        run: ./actionlint -color
+        # actionlint doesn't yet understand GitHub's "$/..." self-repository
+        # `uses:` syntax (https://github.com/rhysd/actionlint/issues/711),
+        # which we use below to resolve zizmor's self-repository findings.
+        # Remove this -ignore once actionlint adds support.
+        run: ./actionlint -color -ignore 'specifying action "\$/" in invalid format'
         shell: bash
 
   test-formatted:
@@ -39,7 +43,7 @@ jobs:
           persist-credentials: false
 
       - name: Run rubyfmt-action against a formatted fixture (expect success)
-        uses: ./
+        uses: $/
         with:
           paths: test/fixtures/formatted.rb
 
@@ -54,7 +58,7 @@ jobs:
       - name: Run rubyfmt-action against an unformatted fixture (expect failure)
         id: rubyfmt
         continue-on-error: true
-        uses: ./
+        uses: $/
         with:
           paths: test/fixtures/unformatted.rb
 
@@ -75,6 +79,6 @@ jobs:
           persist-credentials: false
 
       - name: Run rubyfmt-action against a formatted fixture (expect success)
-        uses: ./
+        uses: $/
         with:
           paths: test/fixtures/formatted.rb
