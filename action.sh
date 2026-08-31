@@ -62,13 +62,6 @@ case "${GHA_RUBYFMT_HEADER_MODE}" in
     *) die "'header-mode' must be one of 'none', 'opt-in', or 'opt-out' (got '${GHA_RUBYFMT_HEADER_MODE}')" ;;
 esac
 
-# Load the pinned (version, platform) -> sha256 table from ./support/versions.
-declare -A checksums
-while read -r version file_platform sha256; do
-    [[ -z "${version}" || "${version}" == \#* ]] && continue
-    checksums["${version} ${file_platform}"]="${sha256}"
-done < "${GITHUB_ACTION_PATH}/support/versions"
-
 version_regex='^v?[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$'
 requested_version="${GHA_RUBYFMT_VERSION}"
 
@@ -80,7 +73,10 @@ else
     die "'version' must be 'latest' or an exact X.Y.Z-N version (got '${requested_version}')"
 fi
 
-sha256="${checksums["${version} ${platform}"]:-}"
+# Look up the pinned checksum for this (version, platform) pair from
+# ./support/versions. Deliberately avoids bash associative arrays (`declare
+# -A`), since macOS runners' default `/bin/bash` is bash 3.2 and lacks them.
+sha256="$(awk -v v="${version}" -v p="${platform}" '$1 == v && $2 == p { print $3 }' "${GITHUB_ACTION_PATH}/support/versions")"
 [[ -n "${sha256}" ]] || die "Unknown rubyfmt version/platform combination: ${version} / ${platform}. Run support/sync-versions.sh to pin a new version."
 
 asset="rubyfmt-v${version}-${platform}.tar.gz"
